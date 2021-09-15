@@ -94,25 +94,36 @@ app.put('/todos/:id', checksExistsUserAccount, (request, response) => {
 
   if(!todo) return response.status(404).json({ error: "Not found"});
 
-  const updatedTodo = {
-    id,
-    title,
-    done: todo.done,
-    deadline,
-    created_at: todo.created_at,
-  }
+  todo.title = title;
+  todo.deadline = new Date(deadline);
 
-  todos.splice(todo, 1, updatedTodo);
-
-  response.status(200).json(updatedTodo);
+  response.status(200).json(todo);
 });
 
 app.patch('/todos/:id/done', checksExistsUserAccount, (request, response) => {
-  // Complete aqui
+  const { user: { todos } } = request;
+  const { id } = request.params;
+
+  const todo = todos.find((todo) => todo.id === id);
+
+  if(!todo) return response.status(404).json({ error: "Not found"});
+
+  todo.done = true;
+
+  response.status(200).json(todo);
 });
 
 app.delete('/todos/:id', checksExistsUserAccount, (request, response) => {
-  // Complete aqui
+  const { user: { todos } } = request;
+  const { id } = request.params;
+
+  const todo = todos.find((todo) => todo.id === id);
+
+  if(!todo) return response.status(404).json({ error: "Not found"});
+
+  todos.splice(todo, 1)
+
+  return response.status(204).json();
 });
 
 module.exports = app;
