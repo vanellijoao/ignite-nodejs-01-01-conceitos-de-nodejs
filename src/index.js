@@ -13,7 +13,15 @@ const users = [
     "id": "c50e4df5-30ff-49e1-b2d1-d7d3c54fa5cc",
     "name": "João Vanelli",
     "username": "vanelli",
-    "todos": []
+    "todos": [
+      {
+        "id": "8b67b08b-abba-445d-8ee3-6b2612ce809d",
+        "title": "Pancreas",
+        "done": false,
+        "deadline": "2021-09-18T03:00:00.000Z",
+        "created_at": "2021-09-15T14:38:04.454Z"
+      }
+    ]
   }
 ];
 
@@ -59,7 +67,8 @@ app.get('/todos', checksExistsUserAccount, (request, response) => {
 });
 
 app.post('/todos', checksExistsUserAccount, (request, response) => {
-  const { user: { todos }, body: { title, deadline } } = request;
+  const { user: { todos } } = request;
+  const { title, deadline } = request.body;
 
   // const formattedDeadline = new Date(deadline + " 00:00");
 
@@ -77,7 +86,25 @@ app.post('/todos', checksExistsUserAccount, (request, response) => {
 });
 
 app.put('/todos/:id', checksExistsUserAccount, (request, response) => {
-  // Complete aqui
+  const { user: { todos } } = request;
+  const { id } = request.params;
+  const { title, deadline } = request.body;
+
+  const todo = todos.find((todo) => todo.id === id);
+
+  if(!todo) return response.status(404).json({ error: "Not found"});
+
+  const updatedTodo = {
+    id,
+    title,
+    done: todo.done,
+    deadline,
+    created_at: todo.created_at,
+  }
+
+  todos.splice(todo, 1, updatedTodo);
+
+  response.status(200).json(updatedTodo);
 });
 
 app.patch('/todos/:id/done', checksExistsUserAccount, (request, response) => {
